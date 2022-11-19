@@ -24,8 +24,7 @@ public class Frustrum : MonoBehaviour
     [SerializeField] Vector3 farBottomLeft;
     [SerializeField] Vector3 farBottomRight;
 
-    [SerializeField] List<WorldObject> worldsObjetc = new List<WorldObject>();
-
+    [SerializeField] List<RoomObject> roomObjects = new List<RoomObject>();
     private void Awake()
     {
         cam = Camera.main;
@@ -33,15 +32,6 @@ public class Frustrum : MonoBehaviour
 
     void Start()
     {
-        for (int i = 0; i < worldsObjetc.Count; i++)
-        {
-            worldsObjetc[i].meshRenderer = TestObjests[i].GetComponent<MeshRenderer>();
-            worldsObjetc[i].meshFilter = TestObjests[i].GetComponent<MeshFilter>();
-            worldsObjetc[i].aabb = new Vector3[aabbPoints];
-            worldsObjetc[i].v3Extents = worldsObjetc[i].meshRenderer.bounds.extents;
-            worldsObjetc[i].scale = worldsObjetc[i].meshRenderer.bounds.size;
-        }
-
         for (int i = 0; i < maxFrustrumPlanes; i++)
         {
             planes[i] = new Plane();
@@ -52,6 +42,13 @@ public class Frustrum : MonoBehaviour
     private void FixedUpdate()
     {
         UpdatePlanes();
+        for (int i = 0; i < roomObjects.Count; i++)
+        {
+            for (int j = 0; j < roomObjects[i].wordList.Count; j++)
+            {
+                CheckObjetColition(roomObjects[i].wordList[j]);
+            }
+        }
     }
     void UpdatePlanes()
     {
@@ -77,10 +74,6 @@ public class Frustrum : MonoBehaviour
         for (int i = 2; i < maxFrustrumPlanes; i++)
         {
             planes[i].Flip();
-        }
-        for (int i = 0; i < worldsObjetc.Count; i++)
-        {
-            CheckObjetColition(worldsObjetc[i]);
         }
     }
     public void SetNearPoints(Vector3 nearPos)

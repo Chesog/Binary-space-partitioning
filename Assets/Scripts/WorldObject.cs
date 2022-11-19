@@ -21,7 +21,14 @@ public class WorldObject : MonoBehaviour
         meshFilter = GetComponent<MeshFilter>();
         aabb = new Vector3[aabbPoints];
         v3Extents = meshRenderer.bounds.extents;
-        scale = meshRenderer.bounds.size;
+    }
+    private void Start()
+    {
+        SetAABBPoints();
+        if (isStatic)
+        {
+            enabled = false;
+        }
     }
     void Update()
     {
@@ -29,18 +36,15 @@ public class WorldObject : MonoBehaviour
     }
     public void SetAABBPoints()
     {
-
-        if (!isStatic)
+        if (scale != transform.lossyScale)
         {
-            if (scale != gameObject.transform.localScale)
-            {
-                Quaternion rotation = gameObject.transform.rotation;
-                gameObject.transform.rotation = Quaternion.identity;
-                v3Extents = meshRenderer.bounds.extents;
-                scale = gameObject.transform.localScale;
-                gameObject.transform.rotation = rotation;
-            }
+            Quaternion rotation = transform.rotation;
+            transform.rotation = Quaternion.identity;
+            v3Extents = meshRenderer.bounds.extents;
+            scale = transform.lossyScale;
+            transform.rotation = rotation;
         }
+
 
         Vector3 center = meshRenderer.bounds.center;
         Vector3 size = v3Extents;
@@ -56,28 +60,25 @@ public class WorldObject : MonoBehaviour
 
 
         // tranformar las Posiciones en puntos en el espacio
-        aabb[0] = transform.TransformPoint(aabb[0]);
-        aabb[1] = transform.TransformPoint(aabb[1]);
-        aabb[2] = transform.TransformPoint(aabb[2]);
-        aabb[3] = transform.TransformPoint(aabb[3]);
-        aabb[4] = transform.TransformPoint(aabb[4]);
-        aabb[5] = transform.TransformPoint(aabb[5]);
-        aabb[6] = transform.TransformPoint(aabb[6]);
-        aabb[7] = transform.TransformPoint(aabb[7]);
+        //aabb[0] = transform.TransformPoint(aabb[0]);
+        //aabb[1] = transform.TransformPoint(aabb[1]);
+        //aabb[2] = transform.TransformPoint(aabb[2]);
+        //aabb[3] = transform.TransformPoint(aabb[3]);
+        //aabb[4] = transform.TransformPoint(aabb[4]);
+        //aabb[5] = transform.TransformPoint(aabb[5]);
+        //aabb[6] = transform.TransformPoint(aabb[6]);
+        //aabb[7] = transform.TransformPoint(aabb[7]);
 
-        if (!isStatic)
-        {
-            // Roto el punto en la direccion que rota el objeto (Punto a rotar , pivot en el que rota , angulo en cada eje)
-            aabb[0] = RotatePointAroundPivot(aabb[0], gameObject.transform.position, gameObject.transform.rotation.eulerAngles);
-            aabb[1] = RotatePointAroundPivot(aabb[1], gameObject.transform.position, gameObject.transform.rotation.eulerAngles);
-            aabb[2] = RotatePointAroundPivot(aabb[2], gameObject.transform.position, gameObject.transform.rotation.eulerAngles);
-            aabb[3] = RotatePointAroundPivot(aabb[3], gameObject.transform.position, gameObject.transform.rotation.eulerAngles);
-            aabb[4] = RotatePointAroundPivot(aabb[4], gameObject.transform.position, gameObject.transform.rotation.eulerAngles);
-            aabb[5] = RotatePointAroundPivot(aabb[5], gameObject.transform.position, gameObject.transform.rotation.eulerAngles);
-            aabb[6] = RotatePointAroundPivot(aabb[6], gameObject.transform.position, gameObject.transform.rotation.eulerAngles);
-            aabb[7] = RotatePointAroundPivot(aabb[7], gameObject.transform.position, gameObject.transform.rotation.eulerAngles);
-        }
 
+        // Roto el punto en la direccion que rota el objeto (Punto a rotar , pivot en el que rota , angulo en cada eje)
+        aabb[0] = RotatePointAroundPivot(aabb[0], transform.position, transform.rotation.eulerAngles);
+        aabb[1] = RotatePointAroundPivot(aabb[1], transform.position, transform.rotation.eulerAngles);
+        aabb[2] = RotatePointAroundPivot(aabb[2], transform.position, transform.rotation.eulerAngles);
+        aabb[3] = RotatePointAroundPivot(aabb[3], transform.position, transform.rotation.eulerAngles);
+        aabb[4] = RotatePointAroundPivot(aabb[4], transform.position, transform.rotation.eulerAngles);
+        aabb[5] = RotatePointAroundPivot(aabb[5], transform.position, transform.rotation.eulerAngles);
+        aabb[6] = RotatePointAroundPivot(aabb[6], transform.position, transform.rotation.eulerAngles);
+        aabb[7] = RotatePointAroundPivot(aabb[7], transform.position, transform.rotation.eulerAngles);
 
     }
     public Vector3 RotatePointAroundPivot(Vector3 point, Vector3 pivot, Vector3 angles)
@@ -114,18 +115,18 @@ public class WorldObject : MonoBehaviour
 
 
         // Draw the AABB Box 
-        Gizmos.DrawLine(aabb[0],aabb[1]);
-        Gizmos.DrawLine(aabb[1],aabb[3]);
-        Gizmos.DrawLine(aabb[3],aabb[2]);
-        Gizmos.DrawLine(aabb[2],aabb[0]);
-        Gizmos.DrawLine(aabb[0],aabb[4]);
-        Gizmos.DrawLine(aabb[4],aabb[5]);
-        Gizmos.DrawLine(aabb[5],aabb[7]);
-        Gizmos.DrawLine(aabb[7],aabb[6]);
-        Gizmos.DrawLine(aabb[6],aabb[4]);
-        Gizmos.DrawLine(aabb[7],aabb[3]);
-        Gizmos.DrawLine(aabb[6],aabb[2]);
-        Gizmos.DrawLine(aabb[5],aabb[1]);
+        Gizmos.DrawLine(aabb[0], aabb[1]);
+        Gizmos.DrawLine(aabb[1], aabb[3]);
+        Gizmos.DrawLine(aabb[3], aabb[2]);
+        Gizmos.DrawLine(aabb[2], aabb[0]);
+        Gizmos.DrawLine(aabb[0], aabb[4]);
+        Gizmos.DrawLine(aabb[4], aabb[5]);
+        Gizmos.DrawLine(aabb[5], aabb[7]);
+        Gizmos.DrawLine(aabb[7], aabb[6]);
+        Gizmos.DrawLine(aabb[6], aabb[4]);
+        Gizmos.DrawLine(aabb[7], aabb[3]);
+        Gizmos.DrawLine(aabb[6], aabb[2]);
+        Gizmos.DrawLine(aabb[5], aabb[1]);
 
         Gizmos.color = Color.green;
     }
