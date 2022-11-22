@@ -7,6 +7,7 @@ public class WorldObject : MonoBehaviour
     [SerializeField] bool isStatic;
     [SerializeField] bool showPoints;
 
+
     const int aabbPoints = 8;
     public MeshRenderer meshRenderer;
     public MeshFilter meshFilter;
@@ -91,6 +92,10 @@ public class WorldObject : MonoBehaviour
 
     private void OnDrawGizmos()
     {
+        if (!Application.isPlaying)
+        {
+            return;
+        }
         DrawAABB();
         if (showPoints)
         {

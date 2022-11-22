@@ -112,6 +112,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isStatic: 1
   showPoints: 0
+  isAWall: 1
   meshRenderer: {fileID: 0}
   meshFilter: {fileID: 0}
   aabb: []
@@ -229,6 +230,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isStatic: 1
   showPoints: 0
+  isAWall: 1
   meshRenderer: {fileID: 0}
   meshFilter: {fileID: 0}
   aabb: []
