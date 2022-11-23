@@ -11,8 +11,11 @@ public class Frustrum : MonoBehaviour
     private const int aabbPoints = 8;
 
     Plane[] planes = new Plane[maxFrustrumPlanes];
+
     public List<Vector3> farPoints = new List<Vector3>();
     public List<Vector3> nearPoints = new List<Vector3>();
+    public float distance;
+
     [SerializeField] List<GameObject> TestObjests = new List<GameObject>();
 
 
@@ -39,7 +42,6 @@ public class Frustrum : MonoBehaviour
     private void Awake()
     {
         cam = Camera.main;
-        updatePoints();
     }
 
     void Start()
@@ -55,7 +57,7 @@ public class Frustrum : MonoBehaviour
         halfCameraHeightfar = Mathf.Tan((cam.fieldOfView / 2) * Mathf.Deg2Rad) * cam.farClipPlane;
         CameraHalfWidthFar = (cam.aspect * halfCameraHeightfar);
 
-        updatePoints();
+        distance = cam.farClipPlane;
     }
 
 
@@ -71,7 +73,15 @@ public class Frustrum : MonoBehaviour
                 CheckObjetColition(roomObjects[i].wordList[j]);
             }
         }
-        updatePoints();
+    }
+
+    public void setLineDistance(float value) 
+    {
+        distance = value;
+    }
+    public float GetDistance() 
+    {
+        return distance;
     }
     void UpdatePlanes()
     {
@@ -100,27 +110,6 @@ public class Frustrum : MonoBehaviour
         }
     }
 
-    public void updatePoints() 
-    {
-
-
-        nearCenter = cam.transform.position;
-        nearCenter += cam.transform.forward * cam.nearClipPlane;
-
-        farCenter = cam.transform.position;
-        farCenter += (cam.transform.forward) * cam.farClipPlane;
-
-        int fov = (int)(cam.fieldOfView * cam.aspect);
-
-        farPoints.Clear();
-
-        farPoints.Add(Quaternion.Euler(0.0f,(float)(- fov / 2),0.0f) * (cam.transform.forward * cam.farClipPlane));
-
-        for (int i = 1; i < fov; i++)
-        {
-            farPoints.Add(Quaternion.Euler(new Vector3(0.0f,(float)i, 0.0f)) * farPoints[0]);
-        }
-    }
     public void SetNearPoints(Vector3 nearPos)
     {
 

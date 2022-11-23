@@ -14,6 +14,7 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
     [SerializeField] Plane[] wallPlanes = new Plane[walls];
 
     List<Vector3> colitionPoints = new List<Vector3>();
+    List<Vector3> colitionPointsDistance = new List<Vector3>();
 
     public Vector3[] wordPoints;
 
@@ -30,25 +31,93 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
 
 
         cam = Camera.main;
+
+        initPoints();
     }
 
     void Update()
     {
-        //setWordPoints();
-        //setWordPlanes();
         checkColitions();
+        updatePoints();
     }
 
     public void checkColitions() 
     {
         colitionPoints.Clear();
 
-        for (int i = 0; i < walls; i++)
+        for (int i = 0; i < frustrum.farPoints.Count; i++)
         {
-            for (int j = 0; j < frustrum.farPoints.Count; j++)
+            List<Vector3> aux = new List<Vector3>();
+
+            for (int j = 0; j < walls; j++)
             {
-                colitionPoints.Add(checkRayPlaneColition(frustrum.nearCenter, frustrum.farPoints[j], ref wallPlanes[i]));
+                Vector3 point = checkRayPlaneColition(frustrum.nearCenter, frustrum.farPoints[i], ref wallPlanes[j]);
+                
+                if (Mathf.Sign(Vector3.Dot(point,cam.transform.forward)) == 1)
+                {
+                    aux.Add(point);
+                }
             }
+
+            Vector3 auxVec;
+
+            if (aux.Count != 0)
+            {
+                auxVec = aux[0];
+
+                for (int h = 0; h < aux.Count; h++)
+                {
+                    if (Vector3.Distance(auxVec, frustrum.nearCenter) > Vector3.Distance(aux[h], frustrum.nearCenter))
+                    {
+                        auxVec = aux[h];
+                    }
+                }
+
+                colitionPoints.Add(auxVec);
+            }
+        }
+    }
+
+    public void initPoints() 
+    {
+        frustrum.nearCenter = cam.transform.position;
+        frustrum.nearCenter += cam.transform.forward * cam.nearClipPlane;
+
+        frustrum.farCenter = cam.transform.position;
+        frustrum.farCenter += (cam.transform.forward) * cam.farClipPlane;
+
+        int fov = (int)(cam.fieldOfView * cam.aspect);
+
+        frustrum.farPoints.Clear();
+
+
+        frustrum.farPoints.Add(Quaternion.Euler(0.0f, (float)(-fov / 2), 0.0f) * (cam.transform.forward * cam.farClipPlane));
+
+        for (int i = 1; i < fov; i++)
+        {
+            frustrum.farPoints.Add(Quaternion.Euler(new Vector3(0.0f, (float)i, 0.0f)) * frustrum.farPoints[0]);
+        }
+    }
+
+    public void updatePoints()
+    {
+        frustrum.nearCenter = cam.transform.position;
+        frustrum.nearCenter += cam.transform.forward * cam.nearClipPlane;
+
+        frustrum.farCenter = cam.transform.position;
+        frustrum.farCenter += (cam.transform.forward) * cam.farClipPlane;
+
+
+        int fov = (int)(cam.fieldOfView * cam.aspect);
+
+        frustrum.farPoints.Clear();
+
+
+        frustrum.farPoints.Add(Quaternion.Euler(0.0f, (float)(-fov / 2), 0.0f) * (cam.transform.forward * cam.farClipPlane));
+
+        for (int i = 1; i < fov; i++)
+        {
+            frustrum.farPoints.Add(Quaternion.Euler(new Vector3(0.0f, (float)i, 0.0f)) * frustrum.farPoints[0]);
         }
     }
 
@@ -59,7 +128,6 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
         float nDotBA = Vector3.Dot(currentPlane.normal, ba);
 
         return a + (((currentPlane.distance - nDotA) / nDotBA) * ba);
-
     }
     public void setWordPoints()
     {
@@ -233,5 +301,10 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
         {
             Gizmos.DrawSphere(colitionPoints[i], 0.5f);
         }
+
+        //for (int i = 0; i < colitionPoints.Count; i++)
+        //{
+        //    Gizmos.DrawLine(frustrum.nearCenter, colitionPoints[i]);
+        //}
     }
 }
