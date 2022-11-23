@@ -41,7 +41,7 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
         updatePoints();
     }
 
-    public void checkColitions() 
+    public void checkColitions()
     {
         colitionPoints.Clear();
 
@@ -51,9 +51,9 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
 
             for (int j = 0; j < walls; j++)
             {
-                Vector3 point = checkRayPlaneColition(frustrum.nearCenter, frustrum.farPoints[i], ref wallPlanes[j]);
-                
-                if (Mathf.Sign(Vector3.Dot(point,cam.transform.forward)) == 1)
+                Vector3 point = checkRayPlaneColition(frustrum.nearCenter, frustrum.farPoints[i], wallPlanes[j]);
+
+                if (Mathf.Sign(Vector3.Dot(point, cam.transform.forward)) == 1)
                 {
                     aux.Add(point);
                 }
@@ -78,7 +78,7 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
         }
     }
 
-    public void initPoints() 
+    public void initPoints()
     {
         frustrum.nearCenter = cam.transform.position;
         frustrum.nearCenter += cam.transform.forward * cam.nearClipPlane;
@@ -112,16 +112,17 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
 
         frustrum.farPoints.Clear();
 
-
-        frustrum.farPoints.Add(Quaternion.Euler(0.0f, (float)(-fov / 2), 0.0f) * (cam.transform.forward * cam.farClipPlane));
+        float distace1 = Vector3.Distance(frustrum.nearCenter, colitionPoints[0]);
+        frustrum.farPoints.Add(Quaternion.Euler(0.0f, (float)(-fov / 2), 0.0f) * (cam.transform.forward.normalized * distace1));
 
         for (int i = 1; i < fov; i++)
         {
-            frustrum.farPoints.Add(Quaternion.Euler(new Vector3(0.0f, (float)i, 0.0f)) * frustrum.farPoints[0]);
+            float distace = Vector3.Distance(cam.transform.position, colitionPoints[i]);
+            frustrum.farPoints.Add(Quaternion.Euler(new Vector3(0.0f, (float)i, 0.0f)) * (frustrum.farPoints[0].normalized * distace));
         }
     }
 
-    public Vector3 checkRayPlaneColition(Vector3 a, Vector3 b, ref Plane currentPlane)
+    public Vector3 checkRayPlaneColition(Vector3 a, Vector3 b, Plane currentPlane)
     {
         Vector3 ba = b - a;
         float nDotA = Vector3.Dot(currentPlane.normal, a);
@@ -274,6 +275,7 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
         wallPlanes[10].Set3Points(wordPoints[15], wordPoints[23], wordPoints[22]);
         wallPlanes[11].Set3Points(wordPoints[22], wordPoints[23], wordPoints[15]);
 
+
         //for (int i = 0; i < walls; ++i)
         //{
         //    GameObject p = GameObject.CreatePrimitive(PrimitiveType.Plane);
@@ -302,9 +304,44 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
             Gizmos.DrawSphere(colitionPoints[i], 0.5f);
         }
 
-        //for (int i = 0; i < colitionPoints.Count; i++)
-        //{
-        //    Gizmos.DrawLine(frustrum.nearCenter, colitionPoints[i]);
-        //}
+        for (int i = 0; i < frustrum.farPoints.Count; i++)
+        {
+            Gizmos.DrawLine(frustrum.nearCenter, colitionPoints[i]);
+        }
+
+        DrawPlane(wordPoints[3], wallPlanes[0].normal, Color.magenta);
+        DrawPlane(wordPoints[5], wallPlanes[1].normal, Color.magenta);
+        DrawPlane(wordPoints[7], wallPlanes[2].normal, Color.magenta);
+        DrawPlane(wordPoints[1], wallPlanes[3].normal, Color.magenta);
+        DrawPlane(wordPoints[19], wallPlanes[4].normal, Color.magenta);
+        DrawPlane(wordPoints[19], wallPlanes[5].normal, Color.yellow);
+        DrawPlane(wordPoints[17], wallPlanes[6].normal, Color.magenta);
+        DrawPlane(wordPoints[17], wallPlanes[7].normal, Color.yellow);
+        DrawPlane(wordPoints[21], wallPlanes[8].normal, Color.magenta);
+        DrawPlane(wordPoints[21], wallPlanes[9].normal, Color.yellow);
+        DrawPlane(wordPoints[23], wallPlanes[10].normal, Color.magenta);
+        DrawPlane(wordPoints[23], wallPlanes[11].normal, Color.yellow);
+    }
+
+    public void DrawPlane(Vector3 position, Vector3 normal, Color color)
+    {
+        Vector3 v3;
+        if (normal.normalized != Vector3.forward)
+            v3 = Vector3.Cross(normal, Vector3.forward).normalized * normal.magnitude;
+        else
+            v3 = Vector3.Cross(normal, Vector3.up).normalized * normal.magnitude; ;
+        var corner0 = position + v3;
+        var corner2 = position - v3;
+        var q = Quaternion.AngleAxis(90.0f, normal);
+        v3 = q * v3;
+        var corner1 = position + v3;
+        var corner3 = position - v3;
+        Debug.DrawLine(corner0, corner2, color);
+        Debug.DrawLine(corner1, corner3, color);
+        Debug.DrawLine(corner0, corner1, color);
+        Debug.DrawLine(corner1, corner2, color);
+        Debug.DrawLine(corner2, corner3, color);
+        Debug.DrawLine(corner3, corner0, color);
+        Debug.DrawRay(position, normal, Color.red);
     }
 }

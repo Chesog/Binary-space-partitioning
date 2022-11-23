@@ -233,10 +233,6 @@ public class Frustrum : MonoBehaviour
         Gizmos.color = Color.red;
         int fov = (int)cam.fieldOfView;
 
-        for (int i = 0; i < farPoints.Count; i++)
-        {
-            Gizmos.DrawLine(nearCenter, farPoints[i]);
-        }
         Gizmos.color = Color.green;
     }
     public void DrawPlane(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
