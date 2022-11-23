@@ -13,7 +13,7 @@ public class Frustrum : MonoBehaviour
     Plane[] planes = new Plane[maxFrustrumPlanes];
     public List<Vector3> farPoints = new List<Vector3>();
     public List<Vector3> nearPoints = new List<Vector3>();
-    [SerializeField] List<GameObject> TestObjests =  new List<GameObject>();
+    [SerializeField] List<GameObject> TestObjests = new List<GameObject>();
 
 
     [SerializeField] Vector3 nearTopLeft;
@@ -31,7 +31,7 @@ public class Frustrum : MonoBehaviour
 
     float halfCameraHeightNear;
     float CameraHalfWidthNear;
-                              
+
     float halfCameraHeightfar;
     float CameraHalfWidthFar;
 
@@ -54,6 +54,7 @@ public class Frustrum : MonoBehaviour
         halfCameraHeightfar = Mathf.Tan((cam.fieldOfView / 2) * Mathf.Deg2Rad) * cam.farClipPlane;
         CameraHalfWidthFar = (cam.aspect * halfCameraHeightfar);
 
+        updatePoints();
     }
 
 
@@ -97,6 +98,7 @@ public class Frustrum : MonoBehaviour
             planes[i].Flip();
         }
     }
+
     public void updatePoints() 
     {
 
@@ -107,9 +109,16 @@ public class Frustrum : MonoBehaviour
         farCenter = cam.transform.position;
         farCenter += (cam.transform.forward) * cam.farClipPlane;
 
-        nearPoints[0] = new Vector3(nearCenter.x - CameraHalfWidthNear,nearCenter.y - CameraHalfWidthNear,nearCenter.z - CameraHalfWidthNear);
+        int fov = (int)(cam.fieldOfView * cam.aspect);
 
-        farPoints[0] = new Vector3(nearCenter.x - CameraHalfWidthFar, nearCenter.y - CameraHalfWidthFar, nearCenter.z - CameraHalfWidthFar);
+        farPoints.Clear();
+
+        farPoints.Add(Quaternion.Euler(0.0f,(float)(- fov / 2),0.0f) * (cam.transform.forward * cam.farClipPlane));
+
+        for (int i = 1; i < fov; i++)
+        {
+            farPoints.Add(Quaternion.Euler(new Vector3(0.0f,(float)i, 0.0f)) * farPoints[0]);
+        }
     }
     public void SetNearPoints(Vector3 nearPos)
     {
@@ -139,6 +148,16 @@ public class Frustrum : MonoBehaviour
         farBottomRight = farPlaneDistance - (cam.transform.up * halfCameraHeightfar) + (cam.transform.right * CameraHalfWidthFar);
     }
 
+    private Vector3 Rotate(Vector3 vector, float degrees)
+    {
+        float sin = Mathf.Sin(degrees * Mathf.Deg2Rad);
+        float cos = Mathf.Cos(degrees * Mathf.Deg2Rad);
+        float vx = vector.x;
+        float vy = vector.y;
+        vector.x = (cos * vx) - (sin * vy);
+        vector.y = (sin * vx) + (cos * vy);
+        return vector;
+    }
 
     public void CheckObjetColition(WorldObject currentObject)
     {
@@ -221,9 +240,13 @@ public class Frustrum : MonoBehaviour
         //Plano Inferior
         DrawPlane(nearBottomLeft, farBottomLeft, farBottomRight, nearBottomRight);
 
-        Gizmos.color = Color.blue;
-        Gizmos.DrawLine(nearCenter,farCenter);
-        Gizmos.DrawLine(nearPoints[0],farPoints[0]);
+        Gizmos.color = Color.red;
+        int fov = (int)cam.fieldOfView;
+
+        for (int i = 0; i < farPoints.Count; i++)
+        {
+            Gizmos.DrawLine(nearCenter, farPoints[i]);
+        }
         Gizmos.color = Color.green;
     }
     public void DrawPlane(Vector3 p1, Vector3 p2, Vector3 p3, Vector3 p4)
