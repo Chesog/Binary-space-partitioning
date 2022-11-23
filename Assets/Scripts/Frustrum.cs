@@ -26,8 +26,8 @@ public class Frustrum : MonoBehaviour
     [SerializeField] Vector3 farBottomLeft;
     [SerializeField] Vector3 farBottomRight;
 
-    [SerializeField] Vector3 nearCenter;
-    [SerializeField] Vector3 farCenter;
+    [SerializeField] public Vector3 nearCenter;
+    [SerializeField] public Vector3 farCenter;
 
     float halfCameraHeightNear;
     float CameraHalfWidthNear;
@@ -39,6 +39,7 @@ public class Frustrum : MonoBehaviour
     private void Awake()
     {
         cam = Camera.main;
+        updatePoints();
     }
 
     void Start()

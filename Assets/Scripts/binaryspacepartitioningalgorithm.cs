@@ -10,7 +10,10 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
 
     Camera cam;
 
+    [SerializeField] Frustrum frustrum;
     [SerializeField] Plane[] wallPlanes = new Plane[walls];
+
+    List<Vector3> colitionPoints = new List<Vector3>();
 
     public Vector3[] wordPoints;
 
@@ -25,6 +28,7 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
         setWordPoints();
         setWordPlanes();
 
+
         cam = Camera.main;
     }
 
@@ -32,12 +36,32 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
     {
         //setWordPoints();
         //setWordPlanes();
+        checkColitions();
     }
-    public void checkColition()
+
+    public void checkColitions() 
     {
+        colitionPoints.Clear();
+
+        for (int i = 0; i < walls; i++)
+        {
+            for (int j = 0; j < frustrum.farPoints.Count; j++)
+            {
+                colitionPoints.Add(checkRayPlaneColition(frustrum.nearCenter, frustrum.farPoints[j], ref wallPlanes[i]));
+            }
+        }
+    }
+
+    public Vector3 checkRayPlaneColition(Vector3 a, Vector3 b, ref Plane currentPlane)
+    {
+        Vector3 ba = b - a;
+        float nDotA = Vector3.Dot(currentPlane.normal, a);
+        float nDotBA = Vector3.Dot(currentPlane.normal, ba);
+
+        return a + (((currentPlane.distance - nDotA) / nDotBA) * ba);
 
     }
-    public void setWordPoints() 
+    public void setWordPoints()
     {
         // Esquina principal
         wordPoints[0] = new Vector3(transform.position.x - 10, transform.position.y, transform.position.z + 10);
@@ -65,19 +89,19 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
 
         wordPoints[12] = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z - 50);
         wordPoints[13] = new Vector3(transform.position.x + 10, transform.position.y + 5, transform.position.z - 50);
-        
+
         wordPoints[14] = new Vector3(transform.position.x + 30, transform.position.y, transform.position.z - 50);
         wordPoints[15] = new Vector3(transform.position.x + 30, transform.position.y + 5, transform.position.z - 50);
-        
+
         wordPoints[16] = new Vector3(transform.position.x + 50, transform.position.y, transform.position.z - 30);
         wordPoints[17] = new Vector3(transform.position.x + 50, transform.position.y + 5, transform.position.z - 30);
-        
+
         wordPoints[18] = new Vector3(transform.position.x + 50, transform.position.y, transform.position.z - 10);
         wordPoints[19] = new Vector3(transform.position.x + 50, transform.position.y + 5, transform.position.z - 10);
-        
+
         wordPoints[20] = new Vector3(transform.position.x + 10, transform.position.y, transform.position.z + 10);
         wordPoints[21] = new Vector3(transform.position.x + 10, transform.position.y + 5, transform.position.z + 10);
-        
+
         wordPoints[22] = new Vector3(transform.position.x + 30, transform.position.y, transform.position.z + 10);
         wordPoints[23] = new Vector3(transform.position.x + 30, transform.position.y + 5, transform.position.z + 10);
 
@@ -86,7 +110,7 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
         // primera puerta
         wordPoints[24] = new Vector3(transform.position.x - 3, transform.position.y, transform.position.z - 10);
         wordPoints[25] = new Vector3(transform.position.x - 3, transform.position.y + 5, transform.position.z - 10);
-       
+
         wordPoints[26] = new Vector3(transform.position.x + 3, transform.position.y, transform.position.z - 10);
         wordPoints[27] = new Vector3(transform.position.x + 3, transform.position.y + 5, transform.position.z - 10);
 
@@ -167,7 +191,7 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
         wordPoints[70] = new Vector3(transform.position.x + 30, transform.position.y, transform.position.z + 3);
         wordPoints[71] = new Vector3(transform.position.x + 30, transform.position.y + 5, transform.position.z + 3);
     }
-    public void setWordPlanes() 
+    public void setWordPlanes()
     {
         wallPlanes[0].Set3Points(wordPoints[2], wordPoints[3], wordPoints[1]);
         wallPlanes[1].Set3Points(wordPoints[4], wordPoints[5], wordPoints[3]);
@@ -201,6 +225,13 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
         for (int i = 0; i < wordMaxPoints; i++)
         {
             Gizmos.DrawSphere(wordPoints[i], 0.5f);
+        }
+
+        Gizmos.color = Color.blue;
+
+        for (int i = 0; i < colitionPoints.Count; i++)
+        {
+            Gizmos.DrawSphere(colitionPoints[i], 0.5f);
         }
     }
 }
