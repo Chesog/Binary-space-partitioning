@@ -169,6 +169,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   farPoints: []
   nearPoints: []
+  distance: 0
   TestObjests:
   - {fileID: 0}
   nearTopLeft: {x: 0, y: 0, z: 0}
@@ -810,6 +811,18 @@ PrefabInstance:
     - target: {fileID: 187646009912860036, guid: d85f0b8d0560a9648b02549ae1eb149b, type: 3}
       propertyPath: m_Name
       value: CornerRoom
+      objectReference: {fileID: 0}
+    - target: {fileID: 196865217603668535, guid: d85f0b8d0560a9648b02549ae1eb149b, type: 3}
+      propertyPath: doorPoints.Array.size
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 196865217603668535, guid: d85f0b8d0560a9648b02549ae1eb149b, type: 3}
+      propertyPath: doorPoints.Array.data[0].x
+      value: -3
+      objectReference: {fileID: 0}
+    - target: {fileID: 196865217603668535, guid: d85f0b8d0560a9648b02549ae1eb149b, type: 3}
+      propertyPath: doorPoints.Array.data[0].z
+      value: -10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d85f0b8d0560a9648b02549ae1eb149b, type: 3}

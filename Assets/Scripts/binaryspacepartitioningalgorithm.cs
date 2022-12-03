@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
+using System.Linq;
 
 public class binaryspacepartitioningalgorithm : MonoBehaviour
 {
@@ -12,6 +14,7 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
 
     [SerializeField] Frustrum frustrum;
     [SerializeField] Plane[] wallPlanes = new Plane[walls];
+    [SerializeField] List<RoomObject> rooms = new List<RoomObject>();
 
     List<Vector3> colitionPoints = new List<Vector3>();
     List<Vector3> colitionPointsDistance = new List<Vector3>();
@@ -25,9 +28,11 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
             wallPlanes[i] = new Plane();
         }
         wordPoints = new Vector3[wordMaxPoints];
+        rooms = GetComponentsInChildren<RoomObject>().ToList();
 
         setWordPoints();
         setWordPlanes();
+        setRoomPlanes();
 
 
         cam = Camera.main;
@@ -39,6 +44,103 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
     {
         checkColitions();
         updatePoints();
+
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            CheckObjetColition(rooms[i]);
+        }
+    }
+
+    public void setRoomPlanes() 
+    {
+        rooms[0].wallPlanes[0] = wallPlanes[0];
+        rooms[0].wallPlanes[1] = wallPlanes[5];
+        rooms[0].wallPlanes[2] = wallPlanes[9];
+        rooms[0].wallPlanes[3] = wallPlanes[3];
+
+        rooms[1].wallPlanes[0] = wallPlanes[11];
+        rooms[1].wallPlanes[1] = wallPlanes[8];
+        rooms[1].wallPlanes[2] = wallPlanes[5];
+        rooms[1].wallPlanes[3] = wallPlanes[3];
+
+        rooms[2].wallPlanes[0] = wallPlanes[10];
+        rooms[2].wallPlanes[1] = wallPlanes[5];
+        rooms[2].wallPlanes[2] = wallPlanes[2];
+        rooms[2].wallPlanes[3] = wallPlanes[3];
+
+        rooms[3].wallPlanes[0] = wallPlanes[4];
+        rooms[3].wallPlanes[1] = wallPlanes[9];
+        rooms[3].wallPlanes[2] = wallPlanes[7];
+        rooms[3].wallPlanes[3] = wallPlanes[0];
+
+        rooms[4].wallPlanes[0] = wallPlanes[4];
+        rooms[4].wallPlanes[1] = wallPlanes[8];
+        rooms[4].wallPlanes[2] = wallPlanes[11];
+        rooms[4].wallPlanes[3] = wallPlanes[7];
+
+        rooms[5].wallPlanes[0] = wallPlanes[4];
+        rooms[5].wallPlanes[1] = wallPlanes[10];
+        rooms[5].wallPlanes[2] = wallPlanes[2];
+        rooms[5].wallPlanes[3] = wallPlanes[7];
+
+        rooms[6].wallPlanes[0] = wallPlanes[0];
+        rooms[6].wallPlanes[1] = wallPlanes[6];
+        rooms[6].wallPlanes[2] = wallPlanes[1];
+        rooms[6].wallPlanes[3] = wallPlanes[9];
+
+        rooms[7].wallPlanes[0] = wallPlanes[8];
+        rooms[7].wallPlanes[1] = wallPlanes[6];
+        rooms[7].wallPlanes[2] = wallPlanes[1];
+        rooms[7].wallPlanes[3] = wallPlanes[11];
+
+        rooms[8].wallPlanes[0] = wallPlanes[10];
+        rooms[8].wallPlanes[1] = wallPlanes[6];
+        rooms[8].wallPlanes[2] = wallPlanes[1];
+        rooms[8].wallPlanes[3] = wallPlanes[2];
+    }
+
+    public void CheckObjetColition(RoomObject currentObject)
+    {
+        bool isInside = false;
+
+        for (int i = 0; i < colitionPoints.Count; i++)
+        {
+            int counter = currentObject.wallPlanes.Length;
+
+            for (int j = 0; j < currentObject.wallPlanes.Length; j++)
+            {
+                if (currentObject.wallPlanes[j].GetSide(colitionPoints[i]))
+                {
+                    counter--;
+                }
+            }
+
+            if (counter == 0)
+            {
+                Debug.Log("Está adentro");
+                isInside = true;
+                break;
+            }
+        }
+
+        if (isInside)
+        {
+            for (int i = 0; i < currentObject.wordList.Count; i++)
+            {
+                currentObject.wordList[i].gameObject.SetActive(true);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < currentObject.wordList.Count; i++)
+            {
+                if (currentObject.gameObject.activeSelf)
+                {
+                    Debug.Log("Está afuera");
+                    currentObject.wordList[i].gameObject.SetActive(false);
+                }
+            }
+        }
     }
 
     public void checkColitions()
