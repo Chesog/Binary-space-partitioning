@@ -1159,4 +1159,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   frustrum: {fileID: 217152722}
+  rooms: []
+  player: {fileID: 567165974}
   wordPoints: []

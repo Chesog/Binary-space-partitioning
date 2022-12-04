@@ -15,6 +15,7 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
     [SerializeField] Frustrum frustrum;
     [SerializeField] Plane[] wallPlanes = new Plane[walls];
     [SerializeField] List<RoomObject> rooms = new List<RoomObject>();
+    [SerializeField] GameObject player;
 
     List<Vector3> colitionPoints = new List<Vector3>();
     List<Vector3> colitionPointsDistance = new List<Vector3>();
@@ -45,10 +46,11 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
         checkColitions();
         updatePoints();
 
-        for (int i = 0; i < rooms.Count; i++)
-        {
-            CheckObjetColition(rooms[i]);
-        }
+       for (int i = 0; i < rooms.Count; i++)
+       {
+           rooms[i].pointInRoom(player.transform.position);
+           CheckObjetColition(rooms[i]);
+       }
     }
 
     public void setRoomPlanes() 
@@ -101,8 +103,6 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
 
     public void CheckObjetColition(RoomObject currentObject)
     {
-        bool isInside = false;
-
         for (int i = 0; i < colitionPoints.Count; i++)
         {
             int counter = currentObject.wallPlanes.Length;
@@ -118,27 +118,12 @@ public class binaryspacepartitioningalgorithm : MonoBehaviour
             if (counter == 0)
             {
                 Debug.Log("Está adentro");
-                isInside = true;
-                break;
+                currentObject.isInside = true;
+                return;
             }
-        }
-
-        if (isInside)
-        {
-            for (int i = 0; i < currentObject.wordList.Count; i++)
+            else
             {
-                currentObject.wordList[i].gameObject.SetActive(true);
-            }
-        }
-        else
-        {
-            for (int i = 0; i < currentObject.wordList.Count; i++)
-            {
-                if (currentObject.gameObject.activeSelf)
-                {
-                    Debug.Log("Está afuera");
-                    currentObject.wordList[i].gameObject.SetActive(false);
-                }
+                currentObject.isInside = false;
             }
         }
     }
