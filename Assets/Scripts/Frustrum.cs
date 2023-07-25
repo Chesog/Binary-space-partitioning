@@ -10,7 +10,7 @@ public class Frustrum : MonoBehaviour
     private const int maxFrustrumPlanes = 6;
     private const int aabbPoints = 8;
 
-    Plane[] planes = new Plane[maxFrustrumPlanes];
+    public Plane[] planes = new Plane[maxFrustrumPlanes];
 
     public List<Vector3> farPoints = new List<Vector3>();
     public List<Vector3> nearPoints = new List<Vector3>();
@@ -19,15 +19,18 @@ public class Frustrum : MonoBehaviour
     [SerializeField] List<GameObject> TestObjests = new List<GameObject>();
 
 
-    [SerializeField] Vector3 nearTopLeft;
-    [SerializeField] Vector3 nearTopRight;
-    [SerializeField] Vector3 nearBottomLeft;
-    [SerializeField] Vector3 nearBottomRight;
+    [SerializeField] public Vector3 nearTopLeft;
+    [SerializeField] public Vector3 nearTopRight;
+    [SerializeField] public Vector3 nearBottomLeft;
+    [SerializeField] public Vector3 nearBottomRight;
 
-    [SerializeField] Vector3 farTopLeft;
-    [SerializeField] Vector3 farTopRight;
-    [SerializeField] Vector3 farBottomLeft;
-    [SerializeField] Vector3 farBottomRight;
+    [SerializeField] public Vector3 farTopLeft;
+    [SerializeField] public Vector3 farTopRight;
+    [SerializeField] public Vector3 farBottomLeft;
+    [SerializeField] public Vector3 farBottomRight;
+
+    [SerializeField] public Vector3 farMidleRight;
+    [SerializeField] public Vector3 farMidleLeft;
 
     [SerializeField] public Vector3 nearCenter;
     [SerializeField] public Vector3 farCenter;
@@ -38,7 +41,6 @@ public class Frustrum : MonoBehaviour
     float halfCameraHeightfar;
     float CameraHalfWidthFar;
 
-    [SerializeField] List<RoomObject> roomObjects = new List<RoomObject>();
     private void Awake()
     {
         cam = Camera.main;
@@ -63,16 +65,7 @@ public class Frustrum : MonoBehaviour
 
     private void FixedUpdate()
     {
-
-
         UpdatePlanes();
-        for (int i = 0; i < roomObjects.Count; i++)
-        {
-            for (int j = 0; j < roomObjects[i].wordList.Count; j++)
-            {
-                CheckObjetColition(roomObjects[i].wordList[j]);
-            }
-        }
     }
 
     public void setLineDistance(float value) 
@@ -136,6 +129,9 @@ public class Frustrum : MonoBehaviour
         farBottomLeft = farPlaneDistance - (cam.transform.up * halfCameraHeightfar) - (cam.transform.right * CameraHalfWidthFar);
 
         farBottomRight = farPlaneDistance - (cam.transform.up * halfCameraHeightfar) + (cam.transform.right * CameraHalfWidthFar);
+
+        farMidleLeft = farPlaneDistance + (cam.transform.right * CameraHalfWidthFar);
+        farMidleRight = farPlaneDistance - (cam.transform.right * CameraHalfWidthFar);
     }
 
     private Vector3 Rotate(Vector3 vector, float degrees)
@@ -149,61 +145,7 @@ public class Frustrum : MonoBehaviour
         return vector;
     }
 
-    public void CheckObjetColition(WorldObject currentObject)
-    {
-        bool isInside = false;
 
-        for (int i = 0; i < aabbPoints; i++)
-        {
-            int counter = maxFrustrumPlanes;
-
-            for (int j = 0; j < maxFrustrumPlanes; j++)
-            {
-                if (planes[j].GetSide(currentObject.aabb[i]))
-                {
-                    counter--;
-                }
-            }
-
-            if (counter == 0)
-            {
-                Debug.Log("Está adentro");
-                isInside = true;
-                break;
-            }
-        }
-
-        if (isInside)
-        {
-            for (int i = 0; i < currentObject.meshFilter.mesh.vertices.Length; i++)
-            {
-                int counter = maxFrustrumPlanes;
-
-                for (int j = 0; j < maxFrustrumPlanes; j++)
-                {
-                    if (planes[j].GetSide(currentObject.gameObject.transform.TransformPoint(currentObject.meshFilter.mesh.vertices[i])))
-                    {
-                        counter--;
-                    }
-                }
-
-                if (counter == 0)
-                {
-                    Debug.Log("Está adentro vert ");
-                    currentObject.gameObject.SetActive(true);
-                    break;
-                }
-            }
-        }
-        else
-        {
-            if (currentObject.gameObject.activeSelf)
-            {
-                Debug.Log("Está afuera");
-                currentObject.gameObject.SetActive(false);
-            }
-        }
-    }
     public void OnDrawGizmos()
     {
         if (!Application.isPlaying)

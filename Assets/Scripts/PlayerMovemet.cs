@@ -6,6 +6,7 @@ public class PlayerMovemet : MonoBehaviour
 {
     private float xMovement;
     private float zMovement;
+    [SerializeField] private Transform playerPos;
 
     public CharacterController controller;
 
@@ -20,5 +21,11 @@ public class PlayerMovemet : MonoBehaviour
         Vector3 move = transform.right * xMovement + transform.forward * zMovement;
 
         controller.Move(move * speed * Time.deltaTime);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawLine(playerPos.position, playerPos.forward * 10);
     }
 }
